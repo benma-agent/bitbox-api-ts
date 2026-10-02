@@ -255,13 +255,6 @@ export function encodeValue(
     }
     case DataType.INT: {
       const n = parseIntValue(value);
-      if (typeof value === 'number') {
-        const bytes = bigIntToSignedBytesBE(n);
-        if (bytes.length > 0 && bytes[0] === 0x00) {
-          return bytes.subarray(1);
-        }
-        return bytes;
-      }
       return bigIntToSignedBytesBE(n);
     }
     case DataType.BOOL: {

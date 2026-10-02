@@ -163,6 +163,21 @@ describe('encodeValue', () => {
     ]);
   });
 
+  it.each([
+    [0, '00'], [1, '01'], [-1, 'ff'],
+    [127, '7f'], [128, '0080'], [129, '0081'],
+    [-127, '81'], [-128, '80'], [-129, 'ff7f'],
+    [255, '00ff'], [256, '0100'], [-255, 'ff01'], [-256, 'ff00'],
+    [32767, '7fff'], [32768, '008000'],
+    [-32768, '8000'], [-32769, 'ff7fff'],
+    [65535, '00ffff'], [65536, '010000'],
+  ] as const)('encodes signed %s consistently across input types', (value, expected) => {
+    const typ = parseType('int64', empty);
+    for (const input of [value, String(value), BigInt(value)]) {
+      expect(Buffer.from(encodeValue(typ, input)).toString('hex')).toBe(expected);
+    }
+  });
+
   it('encodes booleans', () => {
     expect(Array.from(encodeValue(parseType('bool', empty), false))).toEqual([0]);
     expect(Array.from(encodeValue(parseType('bool', empty), true))).toEqual([1]);
